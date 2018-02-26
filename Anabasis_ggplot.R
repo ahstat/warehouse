@@ -1,11 +1,14 @@
+#########################################################
+# Code plotted in https://ahstat.github.io/Clickstream/ #
+#########################################################
 setwd("E:/gitperso/warehouse")
 library(dplyr)
 library(ggplot2)
 
 # Data frame of attemps with pic number, cell clicked, id of user and date.
 df0 = read.csv("data/Anabasis_ggplot/attempts.csv")
-dir.create("graphs", showWarnings = FALSE)
-out_folder = "graphs/Anabasis_ggplot"
+dir.create("outputs", showWarnings = FALSE)
+out_folder = "outputs/Anabasis_ggplot"
 dir.create(out_folder, showWarnings = FALSE)
 
 ##

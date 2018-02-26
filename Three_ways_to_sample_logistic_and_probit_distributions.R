@@ -9,16 +9,15 @@
 # For the probit model, we take g as the Normal probability distribution.
 ###
 
-##
-# Define x values, and parameters of the model
-##
+## Define x values, and parameters of the model
 n = 100000
 x = runif(n, -4, 4)
+a = 3 # slope coefficient
+b = 4 # intercept coefficient
 
-a = 3
-b = 4
-
-## Method 1
+############
+# Method 1 #
+############
 # https://en.wikipedia.org/wiki/Logistic_regression 
 # (section Latent variable interpretation)
 eps = rlogis(n, 0, 1) # logistic model
@@ -27,20 +26,24 @@ y_logis1 = ifelse(a*x + b + eps > 0, 1, 0)
 eps = rnorm(n, 0, 1) # probit model
 y_probit1 = ifelse(a*x + b + eps > 0, 1, 0)
 
-## Method 2
-# https://stats.stackexchange.com/questions/20523/difference-between-logit-and-probit-models
+############
+# Method 2 #
+############
+# https://stats.stackexchange.com/questions/20523/
 y_probit2 = rbinom(n, size=1, prob=pnorm(a*x+b, sd=1))
 y_logis2 = rbinom(n, size=1, prob=plogis(a*x+b, scale=1))
 
-## Method 3
+############
+# Method 3 #
+############
 # From the definition in the GLM
 U = runif(n)
 y_logis3 = ifelse(U < plogis(a*x+b), 1, 0)
 y_probit3 = ifelse(U < pnorm(a*x+b), 1, 0)
 
-##
-# Verification that sample is correct
-##
+#########################################
+# Verification that sampling is correct #
+#########################################
 plot_empirical_distribution = function(x, y, nb_cuts = 100,
                                        comparison = plogis) {
   # comparison should be plogis or pnorm.
@@ -61,9 +64,9 @@ plot_empirical_distribution(x, y_probit1, comparison = pnorm)
 plot_empirical_distribution(x, y_probit2, comparison = pnorm)
 plot_empirical_distribution(x, y_probit3, comparison = pnorm)
 
-##
-# Verification of the coefficients
-##
+####################################
+# Verification of the coefficients #
+####################################
 logitModel1 = glm(y_logis1~x, family=binomial(link="logit"))
 logitModel2 = glm(y_logis2~x, family=binomial(link="logit"))
 logitModel3 = glm(y_logis3~x, family=binomial(link="logit"))
