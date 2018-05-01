@@ -104,3 +104,26 @@ sweep(mat,MARGIN=2,vec,`*`)
 # Example: revstring("bonjour") gives "ruojnob"
 revstring <- function(s) paste(rev(strsplit(s,"")[[1]]),collapse="")
 revstring("bonjour") # "ruojnob"
+
+##########################################################################
+# Sample uniform distribution on the surface of a unit sphere (20180501) #
+##########################################################################
+# http://mathworld.wolfram.com/HyperspherePointPicking.html
+# Pick N points on S^{n-1}
+sample_surface_sphere = function(N, n = 2) {
+  M = matrix(rnorm(n * N), ncol = n)
+  sample = M / sqrt(apply(M^2, 1, sum))
+  return(sample)
+}
+
+# Example
+n = 3 # dimension
+N = 1000 # sample size
+sample = sample_surface_sphere(N, n)
+
+if(ncol(sample) == 2) {
+  plot(sample, asp = 1)
+} else if(ncol(sample) == 3) {
+  library(rgl)
+  plot3d(sample)
+}
