@@ -21,12 +21,14 @@
 #   distribution knowing that the values are greater than a limit 5. If we
 #   want to obtain this sample directly by reject algorithm, most of values
 #   are rejected.
+library(ggplot2)
+set.seed(2713)
 limit = 5 # we want to compute N(. | >limit), where N is normal distribution
 x_test = rnorm(10000)
 max(x_test) # close to 3.5
 which(x_test > limit) # no element, all are rejected 
 
-# Therefore, we will use a Metropolis-Hastings algorithm to compute this
+# Therefore, we will use a Metropolis-Hastings algorithm to sample this
 #   distribution. To do this, we first need the density of this target
 #   distribution up to a constant. This is easily available, by cutting
 #   the normal distribution.
@@ -42,7 +44,7 @@ pi_func = function(x) {pi_func0(x, limit)}
 
 # Then, we need an instrumental distribution which can be easily simulated.
 #   To simplify computations, we take it symmetric. Here, the normal
-#   distribution centred in x and with standard deviation of sd = 0.01 is 
+#   distribution centered in x and with standard deviation of sd = 0.01 is 
 #   chosen. To simulate this distribution is easy.
 # Simulation of the instrumental distribution
 q_func_symm = function(x, sd = 0.01) {
@@ -51,9 +53,9 @@ q_func_symm = function(x, sd = 0.01) {
 }
 
 # The parameter sd indicates the range of each step. When sd is small, each
-#   step is small and the probability to be accepted is higher. However, the
+#   step is small and the probability to be accepted is larger. However, the
 #   Markov chain is moving slowly and many steps are necessary to reach
-#   stationary distribution. When sd is high, higer steps are done, but are
+#   stationary distribution. When sd is large, larger steps are done, but are
 #   accepted less often.
 
 # The density of the instrumental distribution is not needed here, since
@@ -85,7 +87,7 @@ alpha = function(x_t, y_t_plus_1) {
 
 # Now, we can begin an example of this algorithm.
 N = 1000000 # length of the chain
-sd = 0.01 # standard deviation of the steps move
+sd = 3 # standard deviation of the steps move
 x_1 = limit # initialization of the chain
 
 # x_{t} contains the chain from date 1 to N
@@ -104,7 +106,20 @@ step = 1000
 simulated_distr = x_t_vect[seq(from = step, by = step, to = length(x_t_vect))]
 # We obtain a sample of length N/step following the normal distribution knowing
 #   that values are greater than limit.
-plot(simulated_distr)
+#png("metropolis_sample_large.png", 600, 400)
+#png("metropolis_sample.png", 375, 375)
+qplot(1:length(simulated_distr), simulated_distr, 
+      xlab = "Index", ylab = "Sampled element", ylim = c(5, 6.43)) + theme_light()
+#dev.off()
+
+# From direct formula (i.e. without Metropolis-Hastings algorithm)
+#png("true_sample.png", 375, 375)
+N_direct = 1000
+set.seed(2713)
+simulated_distr_direct = qnorm(pnorm(limit) + runif(N_direct) * (1 - pnorm(limit)))
+qplot(1:length(simulated_distr_direct), simulated_distr_direct, 
+      xlab = "Index", ylab = "Sampled element", ylim = c(5, 6.43)) + theme_light()
+#dev.off()
 
 # We check results by plotting the histogram of our sample, and the
 #   density of N(. | >limit) known up to a multiplicative constant. We
